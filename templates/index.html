@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VEO 3 Prompt Generator | AI Video Creator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --dark: #1e293b;
+            --darker: #0f172a;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --success: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--darker);
+            color: var(--light);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .logo i {
+            font-size: 2.5rem;
+            color: var(--primary);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, var(--primary), #a855f7);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.1rem;
+        }
+        
+        .generator-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .form-section {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 1rem;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--gray);
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            color: var(--light);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.3);
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .radio-option input {
+            width: auto;
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn i {
+            font-size: 1rem;
+        }
+        
+        .result-section {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 1rem;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .copy-btn {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--gray);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .copy-btn:hover {
+            color: var(--light);
+            border-color: var(--primary);
+        }
+        
+        #prompt-result {
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        
+        #prompt-result h1, 
+        #prompt-result h2, 
+        #prompt-result h3 {
+            margin: 1rem 0;
+            color: var(--primary);
+        }
+        
+        #prompt-result pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+        }
+        
+        #prompt-result code {
+            font-family: 'Courier New', monospace;
+        }
+        
+        .loading {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.85);
+            border-radius: 1rem;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 1.5rem;
+            z-index: 10;
+            backdrop-filter: blur(2px);
+            text-align: center;
+        }
+        
+        .spinner-modern {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .loading-text {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 8px #0008;
+        }
+        
+        .examples {
+            margin-top: 2rem;
+        }
+        
+        .examples h3 {
+            color: var(--gray);
+            margin-bottom: 1rem;
+        }
+        
+        .example-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .example-tag {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .example-tag:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .generator-container {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+            </div>
+            <h1>Generator Prompt VEO 3</h1>
+            <p class="subtitle">Buat prompt sempurna untuk video AI dengan presisi</p>
+        </header>
+        
+        <div class="generator-container">
+            <div class="form-section">
+                <form id="prompt-form" method="POST">
+                    <div class="form-group" id="scene-group">
+                        <label>Deskripsikan setiap scene video Anda</label>
+                        <div class="scene-inputs">
+                            <textarea name="ide" class="scene-textarea" placeholder="Contoh: Opening - Seorang wanita masuk ke dalam kafe..."></textarea>
+                        </div>
+                        <button type="button" id="add-scene-btn" class="btn" style="margin-top:10px;"><i class="fas fa-plus"></i> Tambah Scene</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Pilih Bahasa Voice</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="id" name="bahasa" value="id" checked>
+                                <label for="id">Voice Indonesia</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="en" name="bahasa" value="en">
+                                <label for="en">Voice Inggris</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="style">Gaya Visual</label>
+                        <select id="style" name="style">
+                            <option value="realistic">Realistis</option>
+                            <option value="cinematic">Sinematik</option>
+                            <option value="anime">Anime</option>
+                            <option value="cyberpunk">Cyberpunk</option>
+                            <option value="retro">Retro 80an</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="duration">Durasi Video</label>
+                        <select id="duration" name="duration">
+                            <option value="10s">10 detik</option>
+                            <option value="15s" selected>15 detik</option>
+                            <option value="30s">30 detik</option>
+                            <option value="1m">1 menit</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="genre">Pilih Genre/Style</label>
+                        <select id="genre" name="genre">
+                            <option value="vlog">Vlog</option>
+                            <option value="iklan">Iklan</option>
+                            <option value="edukasi">Edukasi</option>
+                            <option value="sinetron">Sinetron</option>
+                            <option value="film_pendek">Film Pendek</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Upload Gambar/Video (opsional, untuk inspirasi)</label>
+                        <input type="file" id="media-upload" name="media" accept="image/*,video/*">
+                        <div id="media-preview" style="margin-top:10px;"></div>
+                    </div>
+                    
+                    <button type="submit" id="generate-btn" class="btn">
+                        <i class="fas fa-magic"></i> Buat Prompt
+                    </button>
+                </form>
+                
+                <div class="examples">
+                    <h3>Coba contoh ini:</h3>
+                    <div class="example-tags">
+                        <div class="example-tag">Vlog perjalanan di pantai Bali</div>
+                        <div class="example-tag">Review teknologi iPhone 15</div>
+                        <div class="example-tag">Tutorial memasak pasta</div>
+                        <div class="example-tag">Rutinitas olahraga</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-header">
+                    <h3>Prompt VEO 3 Anda</h3>
+                    <button id="copy-btn" class="copy-btn">
+                        <i class="far fa-copy"></i> Salin
+                    </button>
+                </div>
+                <div id="prompt-result">
+                    <p style="color: var(--gray); text-align: center; margin-top: 2rem;">
+                        Prompt yang dihasilkan akan muncul di sini
+                    </p>
+                </div>
+                <div id="loading" class="loading" style="display: none;">
+                    <div class="spinner-modern">
+                        <svg width="60" height="60" viewBox="0 0 60 60">
+                            <defs>
+                                <linearGradient id="spinner-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" stop-color="#6366f1"/>
+                                    <stop offset="100%" stop-color="#a855f7"/>
+                                </linearGradient>
+                            </defs>
+                            <circle cx="30" cy="30" r="24" stroke="url(#spinner-gradient)" stroke-width="6" fill="none" stroke-linecap="round">
+                                <animateTransform attributeName="transform" type="rotate" from="0 30 30" to="360 30 30" dur="1s" repeatCount="indefinite"/>
+                            </circle>
+                        </svg>
+                    </div>
+                    <div class="loading-text">Membuat prompt sempurna untuk Anda...</div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Generator Prompt VEO 3 &copy; {{ current_year }} | Alat Pembuatan Video AI</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.initialize({ startOnLoad: true });
+            
+            const generateBtn = document.getElementById('generate-btn');
+            const copyBtn = document.getElementById('copy-btn');
+            const promptResult = document.getElementById('prompt-result');
+            const loading = document.getElementById('loading');
+            const exampleTags = document.querySelectorAll('.example-tag');
+            
+            // Example tags click handler
+            exampleTags.forEach(tag => {
+                tag.addEventListener('click', function() {
+                    document.getElementById('ide').value = this.textContent;
+                });
+            });
+            
+            // Generate prompt
+            generateBtn.addEventListener('click', async function(event) {
+                event.preventDefault();
+                const form = document.getElementById('prompt-form');
+                const formData = new FormData(form);
+                
+                if (!formData.get('ide').trim()) {
+                    alert('Silakan jelaskan ide video Anda terlebih dahulu');
+                    return;
+                }
+                
+                loading.style.display = 'flex';
+                
+                try {
+                    const response = await fetch('/', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Respon jaringan tidak baik');
+                    }
+                    
+                    const result = await response.text();
+                    promptResult.innerHTML = result;
+                    
+                    // Re-initialize Mermaid for any diagrams
+                    mermaid.init();
+                } catch (error) {
+                    console.error('Error:', error);
+                    promptResult.innerHTML = '<p style="color: #ef4444;">Gagal membuat prompt. Silakan coba lagi.</p>';
+                } finally {
+                    loading.style.display = 'none';
+                }
+            });
+            
+            // Copy to clipboard
+            copyBtn.addEventListener('click', function() {
+                navigator.clipboard.writeText(promptResult.innerText);
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Tersalin!';
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            });
+
+            const sceneGroup = document.getElementById('scene-group');
+            const sceneInputs = sceneGroup.querySelector('.scene-inputs');
+            const addSceneBtn = document.getElementById('add-scene-btn');
+
+            addSceneBtn.addEventListener('click', function() {
+                const textarea = document.createElement('textarea');
+                textarea.name = 'ide';
+                textarea.className = 'scene-textarea';
+                textarea.placeholder = 'Contoh: Scene berikutnya...';
+                textarea.style.marginTop = '10px';
+                // Tombol hapus
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'btn';
+                removeBtn.style.marginLeft = '10px';
+                removeBtn.style.background = '#ef4444';
+                removeBtn.style.color = 'white';
+                removeBtn.innerHTML = '<i class="fas fa-trash"></i> Hapus';
+                removeBtn.onclick = function() {
+                    sceneInputs.removeChild(wrapper);
+                };
+                // Wrapper
+                const wrapper = document.createElement('div');
+                wrapper.style.display = 'flex';
+                wrapper.style.alignItems = 'center';
+                wrapper.appendChild(textarea);
+                wrapper.appendChild(removeBtn);
+                sceneInputs.appendChild(wrapper);
+            });
+
+            const mediaUpload = document.getElementById('media-upload');
+            const mediaPreview = document.getElementById('media-preview');
+
+            mediaUpload.addEventListener('change', function() {
+                mediaPreview.innerHTML = '';
+                const file = this.files[0];
+                if (!file) return;
+                if (file.type.startsWith('image/')) {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    img.style.maxWidth = '200px';
+                    img.style.maxHeight = '150px';
+                    img.style.display = 'block';
+                    mediaPreview.appendChild(img);
+                } else if (file.type.startsWith('video/')) {
+                    const video = document.createElement('video');
+                    video.src = URL.createObjectURL(file);
+                    video.controls = true;
+                    video.style.maxWidth = '200px';
+                    video.style.maxHeight = '150px';
+                    mediaPreview.appendChild(video);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
